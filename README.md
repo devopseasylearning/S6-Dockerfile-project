@@ -79,8 +79,8 @@ here are the instruction need for the image
 ```
 
 
-```
 Command to build the image:
+```
 docker build --build-arg UBUNTU_VERSION=20.04 --build-arg APP_NAME=myapp --build-arg ENV=development -t my-custom-image .
 
 ```
