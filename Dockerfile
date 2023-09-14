@@ -54,10 +54,11 @@ USER root
 RUN mkdir -p /root/REPOS
 
 # Open port range from 80 to 6000 (excluding 3030, 4878, 4596)
-EXPOSE 80-6000/tcp
-EXPOSE 3030/tcp
-EXPOSE 4878/tcp
-EXPOSE 4596/tcp
+RUN ufw allow 80:6000/tcp \
+    ufw delete allow 3030/tcp \
+    ufw delete allow 4878/tcp \
+    ufw delete allow 4596/tcp \
+    ufw --force enable
 
 # Create a directory called GIT under REPOS and copy repositories
 RUN mkdir -p /root/REPOS/GIT && \
