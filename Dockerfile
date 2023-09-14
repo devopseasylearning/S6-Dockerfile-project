@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     git \
     gnupg \
     jq \
-    linux-headers-$(uname -r) \
+    linux-headers\
     openssh-client \
     postgresql-client \
     python3 \
