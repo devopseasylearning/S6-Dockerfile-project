@@ -77,3 +77,10 @@ here are the instruction need for the image
 * create a user called  "builder" and make himas the default user
 * the first command to run when the container start should be "/bin/bash"
 ```
+
+
+```
+Command to build the image:
+docker build --build-arg UBUNTU_VERSION=20.04 --build-arg APP_NAME=myapp --build-arg ENV=development -t my-custom-image .
+
+```
