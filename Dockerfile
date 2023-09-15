@@ -1,6 +1,6 @@
 # set the base image tag with ARG
-ARG BASE_IMAGE=ubuntu
-FROM $BASE_IMAGE
+ARG BASE_IMAGE_TAG=ubuntu:20.04
+FROM $BASE_IMAGE_TAG
 
 # Set the metadata for the base_image
 LABEL owner= DEVOPS EASY LEARNING
