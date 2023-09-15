@@ -39,9 +39,9 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /BUILDER
 
 # Create environment variables
-ENV APP_NAME="your_app_name" \
-    ENV="your_env" \
-    TEAM=Devops
+ARG APP_NAME
+ARG ENV
+ENV APP_NAME=${APP_NAME} ENV=${ENV} TEAM=Devops
 
 # Set the default user to root
 USER root
@@ -60,9 +60,9 @@ RUN mkdir -p /root/REPOS/GIT && \
     ufw --force enable
 
 # Copy repositories
-COPY ./KFC-app.git /root/REPOS/GIT/KFC-app.git
-COPY ./awesome-compose.git /root/REPOS/GIT/awesome-compose.git
-COPY ./production-deployment.git /root/REPOS/GIT/production-deployment.git
+COPY ./KFC-app.git /root/REPOS/GIT/
+COPY ./awesome-compose.git /root/REPOS/GIT/
+COPY ./production-deployment.git /root/REPOS/GIT/
 
 # Copy K8S backend and frontend
 COPY ./K8S/backend /BUILDER/K8S/backend
