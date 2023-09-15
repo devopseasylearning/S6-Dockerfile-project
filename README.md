@@ -77,3 +77,31 @@ here are the instruction need for the image
 * create a user called  "builder" and make himas the default user
 * the first command to run when the container start should be "/bin/bash"
 ```
+
+
+## HOW TO THEST THE DOCKERFILE
+
+```
+1- login to one of the school server please make sure you are not in your terminal it will not work 
+
+2- run the following command:  
+           rm -rf S6-Dockerfile-project.git  || true 
+
+3- run the following command:   
+           git clone  https://github.com/devopseasylearning/S6-Dockerfile-project.git 
+
+4- run the following command:  
+           cd S6-Dockerfile-project.git 
+
+5- run the following command: 
+          git checkout [ENTER YOUR PREFER NAME HERE]
+6-  run the following command:      docker login -u devopseasylearning                
+       PS: you will be prompt to enter the password if you dont know the password get it from your student account under tools section.
+7-  run the following command:  
+             docker build --build-arg [ENTER THE TAG ARGUMENT HERE]=22.04  \
+              --build-arg APP_NAME=S6 \
+              --build-arg APP_NAME="learning_dockerfile" \
+              -t  devopseasylearning/[ENTER YOUR PREFER NAME HERE]:V1.0.1 .
+8- run the following command: 
+              docker push devopseasylearning/[ENTER YOUR PREFER NAME HERE]:V1.0.1
+```
