@@ -1,21 +1,21 @@
+# Use ARG to allow the user to specify the base image tag at build time
+ARG BASE_IMAGE_TAG=20.04
 
-# Define the base image tag version at build time
-ARG UBUNTU_VERSION=20.04
+# Use the desired Ubuntu base image
+FROM ubuntu:${BASE_IMAGE_TAG}
 
-# Use Ubuntu as the base image with the specified version
-FROM ubuntu:${UBUNTU_VERSION}
-
-# Set the image maintainer/owner
+# Set the company as the image maintainer
 LABEL maintainer="DEVOPS EASY LEARNING"
 
 # Install required packages
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
     ansible \
     curl \
     git \
     gnupg \
     jq \
-    linux-headers\
+    linux-headers-$(uname -r) \
     openssh-client \
     postgresql-client \
     python3 \
@@ -35,48 +35,37 @@ RUN apt-get update && apt-get install -y \
     maven \
     helm \
     ufw \
-    go && \
-    rm -rf /var/lib/apt/lists/*
+    go
 
-# Set the default directory
+# Set the default working directory
 WORKDIR /BUILDER
 
-# Create environment variables (APP_NAME and ENV) defined at build time
+# Create environment variables
 ARG APP_NAME
 ARG ENV
-ENV APP_NAME=$APP_NAME
-ENV ENV=$ENV
+ENV APP_NAME=${APP_NAME}
+ENV ENV=${ENV}
 ENV TEAM=Devops
 
 # Set the default user to root
 USER root
 
-# Create the REPOS directory under the root user's home directory
-RUN mkdir -p /root/REPOS
+# Create directories
+RUN mkdir -p /root/REPOS/GIT /BUILDER/K8S /BUILDER/FRONTEND
 
 # Open port range from 80 to 6000 (excluding 3030, 4878, 4596)
-EXPOSE 80-6000/tcp
-EXPOSE 3030/tcp
-EXPOSE 4878/tcp
-EXPOSE 4596/tcp
+RUN ufw allow 80:6000/tcp && ufw deny 3030 4878 4596 && ufw --force enable
 
-# Create a directory called GIT under REPOS and copy repositories
-RUN mkdir -p /root/REPOS/GIT && \
-    git clone https://github.com/devopseasylearning/KFC-app.git /root/REPOS/GIT/KFC-app && \
-    git clone https://github.com/devopseasylearning/awesome-compose.git /root/REPOS/GIT/awesome-compose && \
-    git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT/production-deployment
+# Copy repositories to /root/REPOS/GIT
+COPY --chown=root:root . /root/REPOS/GIT
 
-# Copy K8S and backend directory under the default directory
-COPY K8S backend /BUILDER/
-
-# Create a directory called FRONTEND under the default directory and copy frontend directory inside
-RUN mkdir -p /BUILDER/FRONTEND && \
-    cp -rf frontend /BUILDER/FRONTEND
+# Copy K8S backend and frontend directory
+COPY --chown=root:root K8S /BUILDER/K8S/
+COPY --chown=root:root frontend /BUILDER/FRONTEND/
 
 # Create a user called "builder" and make it the default user
 RUN useradd -ms /bin/bash builder
 USER builder
-WORKDIR /home/builder
 
-# Specify the command to run when the container starts
+# Set the entry command
 CMD ["/bin/bash"]
