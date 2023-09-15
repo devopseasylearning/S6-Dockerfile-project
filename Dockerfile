@@ -1,7 +1,7 @@
 
 # Use a base image specified by the user at build time
-ARG BASE_IMAGE
-FROM $BASE_IMAGE
+ARG TAG
+FROM ubuntu:$TAG
 # Set the company label
 LABEL maintainer="DEVOPS EASY LEARNING"
 # Update the package lists and install the desired packages
