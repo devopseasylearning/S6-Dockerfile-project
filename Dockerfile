@@ -57,7 +57,7 @@ RUN mkdir -p /root/REPOS/GIT /BUILDER/K8S /BUILDER/FRONTEND
 RUN ufw allow 80:6000/tcp && ufw deny 3030 4878 4596 && ufw --force enable
 
 # Copy repositories to /root/REPOS/GIT
-COPY --chown=root:root . /root/REPOS/GIT
+COPY --chown=root:root . /root/REPOS/GIT/
 
 # Copy K8S backend and frontend directory
 COPY --chown=root:root K8S /BUILDER/K8S/
