@@ -1,5 +1,5 @@
 ARG UBUNTU_VERSION=20.04
-FROM ubuntu:20.04 
+FROM ubuntu:${UBUNTU_VERSION}  
 LABEL maintainer="DEVOPS EASY LEARNING <contact@devopseasylearning.com>"
 WORKDIR /BUILDER
 RUN apt-get update && apt-get install -y \
