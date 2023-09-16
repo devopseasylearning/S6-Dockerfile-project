@@ -48,9 +48,10 @@ RUN apt install git -y && \
     git clone https://github.com/devopseasylearning/awesome-compose.git && \
     git clone https://github.com/devopseasylearning/production-deployment.git && \
     cp ./* /root/REPOS/GIT/
-COPY k8S-backen /BUILDER/k8S-backen
-RUN mkdir -p /BUILDER/FRONTEND
-COPY frontend /BUILDER/FRONTEND
-RUN useradd -ms /bin/bash builder
+COPY ./k8S .
+COPY ./backen .
+RUN mkdir FRONTEND
+COPY ./frontend/* ./FRONTEND
+RUN useradd builder
 USER builder
 CMD ["/bin/bash"]
