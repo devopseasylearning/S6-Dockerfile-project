@@ -98,10 +98,7 @@ here are the instruction need for the image
 6-  run the following command:      docker login -u devopseasylearning                
        PS: you will be prompt to enter the password if you dont know the password get it from your student account under tools section.
 7-  run the following command:  
-             docker build --build-arg [ENTER THE TAG ARGUMENT HERE]=22.04  \
-              --build-arg APP_NAME=S6 \
-              --build-arg APP_NAME="learning_dockerfile" \
-              -t  devopseasylearning/[ENTER YOUR PREFER NAME HERE]:V1.0.1 .
+             docker build --build-arg [ENTER THE TAG ARGUMENT HERE]=22.04 --build-arg APP_NAME=S6 -t  devopseasylearning/[ENTER YOUR PREFER NAME HERE]:V1.0.1 .
 8- run the following command: 
               docker push devopseasylearning/[ENTER YOUR PREFER NAME HERE]:V1.0.1
 ```
