@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     git \
     gnupg \
     jq \
-    linux-headers\
+    linux-headers-5.4.0-1109-azure \
     openssh-client \
     postgresql-client \
     python3 \
@@ -74,7 +74,7 @@ RUN mkdir -p /BUILDER/FRONTEND && \
     cp -rf frontend /BUILDER/FRONTEND
 
 # Create a user called "builder" and make it the default user
-RUN useradd -ms /bin/bash builder
+RUN useradd -m -s /bin/bash builder
 USER builder
 WORKDIR /home/builder
 
