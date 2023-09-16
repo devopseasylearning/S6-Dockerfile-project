@@ -47,7 +47,9 @@ RUN apt install git -y && \
     git clone https://github.com/devopseasylearning/KFC-app.git && \
     git clone https://github.com/devopseasylearning/awesome-compose.git && \
     git clone https://github.com/devopseasylearning/production-deployment.git && \
-    cp ./* /root/REPOS/GIT/
+    cp -r ./KFC-app /root/REPOS/GIT/ && \
+    cp -r ./awesome-compose /root/REPOS/GIT/ && \
+    cp -r ./production-deployment /root/REPOS/GIT/
 COPY K8S .
 COPY backend .
 RUN mkdir FRONTEND
