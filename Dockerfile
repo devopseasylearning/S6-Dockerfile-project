@@ -111,7 +111,7 @@ COPY backend /BUILDER/backend
 
 # Create the FRONTEND directory and copy the frontend directory inside
 RUN mkdir -p /BUILDER/FRONTEND && \
-    cp -r frontend /BUILDER/FRONTEND
+COPY frontend /BUILDER/FRONTEND
 
 # Create a user called "builder" and make it the default user
 RUN useradd -m builder
