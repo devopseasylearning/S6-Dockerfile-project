@@ -2,11 +2,11 @@
 ARG BASE_IMG_TAG=latest
 FROM ubuntu:${BASE_IMG_TAG}
 
-# Set the default user to be "root"
-USER root
-
 # Set the maintainer (owner) of the image
 LABEL maintainer="DEVOPS EASY LEARNING <del@devopseasylearning.com>"
+
+# Set the default user to be "root"
+USER root
 
 # Set the environment variables with user-defined values where APP_NAME and ENV defined at build time
 ARG APP_NAME
