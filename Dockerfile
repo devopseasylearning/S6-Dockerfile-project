@@ -5,6 +5,9 @@ LABEL maintainer="DEVOPS EASY LEARNING"
 # Set the default directory to "BUILDER"
 WORKDIR /BUILDER
 
+# Set noninteractive mode
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install the required packages
 RUN apt-get update && apt-get install -y \
     ansible \
@@ -27,9 +30,18 @@ RUN apt-get update && apt-get install -y \
     default-jre \
     default-jdk \
     maven \
-    ufw \
-    go
-    
+    ufw
+
+# Install Go
+RUN wget https://golang.org/dl/go1.17.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.17.linux-amd64.tar.gz && \
+    rm go1.17.linux-amd64.tar.gz
+
+# Set Go environment variables
+ENV GOROOT=/usr/local/go
+ENV GOPATH=$HOME/go
+ENV PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
 # Install kubectl
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
     chmod +x kubectl && \
