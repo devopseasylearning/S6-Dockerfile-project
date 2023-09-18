@@ -33,6 +33,22 @@ RUN mkdir -p /root/REPOS
 # Create the "GIT" directory under the "REPOS" directory
 RUN mkdir -p /root/REPOS/GIT
 
+#create a directory called FRONTEND under the default directory
+RUN mkdir FRONTEND
+
+# Copy frontend directory inside FRONTEND
+COPY ../frontend ./FRONTEND
+
+# Clone the specified repositories into the "GIT" directory
+RUN git clone https://github.com/devopseasylearning/KFC-app.git /root/REPOS/GIT/KFC-app && \
+    git clone https://github.com/devopseasylearning/awesome-compose.git /root/REPOS/GIT/awesome-compose && \
+    git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT/production-deployment
+
+
+# Copy the "K8S backend"
+COPY ../K8S .
+COPY ../backend . 
+
 # When the image is being built, kindly remember to specify the tag image version, else the build will be
 # reverted to the latest ubuntu version specified in line 8. You can do this tag specification by adding
 # the tag variable during your image build  by using the below example as follows;
@@ -59,14 +75,15 @@ RUN apt-get update && \
     iputils-ping \
     && apt-get clean
 
+# Enable the firewall
+RUN ufw --force enable
+
 # Allow ports 80 to 6000 and exclude ports 3030, 4878, and 4596
 RUN ufw allow 80:6000/tcp && \
     ufw delete allow 3030/tcp && \
     ufw delete allow 4878/tcp && \
     ufw delete allow 4596/tcp
 
-# Enable the firewall
-RUN ufw --force enable
 
 # Install Node.js and npm
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
@@ -109,3 +126,11 @@ RUN rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove -y && \
     apt-get clean
 
+# Create a user named "builder" and make him as the default user
+RUN useradd -ms /bin/bash builder
+
+# Set the default user to "builder"
+USER builder
+
+# Set the default/first command to be "/bin/bash" to run when the container starts
+CMD ["/bin/bash"]
