@@ -7,35 +7,53 @@ FROM ubuntu:${TAG_VERSION}
 #set the company DEVOPS EASY LEARNING  as the sole owner of the image
 LABEL maintainer="DEVOPS EASY LEARNING"
 
-#Install packages
-RUN apt-get update && \
-    apt-get install -y \
+# Install required packages
+RUN apt-get update && apt-get install -y \
     ansible \
     curl \
     git \
     gnupg \
     jq \
-    linux-headers \
+    linux-headers-$(uname -r) \
+    openssh-client \
     postgresql-client \
     python3 \
-    kubectl \
-    kubens \
-    modejs \
+    nodejs \
     npm \
     vim \
     wget \
-    pip \
+    python3-pip \
     net-tools \
     iputils-ping \
-    terraform \
     awscli \
     default-jre \
     default-jdk \
     maven \
-    helm \
     ufw \
-    git \
-    go
+    golang-go
+
+# Install kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/
+
+# Install kubens
+RUN curl -LO "https://github.com/ahmetb/kubectx/releases/latest/download/kubens" && \
+    chmod +x kubens && \
+    mv kubens /usr/local/bin/
+
+# Install terraform
+RUN curl -LO "https://releases.hashicorp.com/terraform/0.15.5/terraform_0.15.5_linux_amd64.zip" && \
+    unzip terraform_0.15.5_linux_amd64.zip && \
+    chmod +x terraform && \
+    mv terraform /usr/local/bin/
+
+# Install helm
+RUN curl -LO "https://get.helm.sh/helm-v3.7.1-linux-amd64.tar.gz" && \
+    tar -xvf helm-v3.7.1-linux-amd64.tar.gz && \
+    chmod +x linux-amd64/helm && \
+    mv linux-amd64/helm /usr/local/bin/ && \
+    rm -rf helm-v3.7.1-linux-amd64.tar.gz linux-amd64
 
 WORKDIR /BUILDER
 
@@ -63,7 +81,7 @@ RUN mkdir -p /root/REPOS/GIT && \
 COPY K8S backend /BUILDER
 RUN mkdir -p /BUILDER/FRONTEND && \
     cp -rf frontend /BUILDER/FRONTEND \
-    useradd -m builder 
+    useradd -ms /bin/bash builder 
 
 USER builder
 
