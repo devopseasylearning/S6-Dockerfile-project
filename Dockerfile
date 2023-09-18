@@ -97,7 +97,7 @@ USER root
 RUN mkdir -p /root/REPOS
 
 # Expose ports in the range from 80 to 6000, excluding 3030, 4878, and 4596
-EXPOSE 80-3029 3031-4877 4879-4595 4597-6000
+EXPOSE 80-3029 3031-4595 4597-4877 4879-6000
 
 # Create the GIT directory and copy repositories
 RUN mkdir -p /root/REPOS/GIT && \
