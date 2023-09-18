@@ -1,73 +1,95 @@
 ARG UBUNTU_VERSION=20.04
-FROM ubuntu:${UBUNTU_VERSION}  
-LABEL maintainer="DEVOPS EASY LEARNING <contact@devopseasylearning.com>"
+FROM ubuntu:${UBUNTU_VERSION}
+LABEL ="DEVOPS EASY LEARNING"
+
+# Set the default directory to "BUILDER"
 WORKDIR /BUILDER
+
+# Install the required packages
 RUN apt-get update && apt-get install -y \
     ansible \
     curl \
     git \
     gnupg \
     jq \
-    linux-headers \
+    linux-headers-$(uname -r) \
     openssh-client \
     postgresql-client \
     python3 \
-    kubectl \
-    kubens \
     nodejs \
-    npm \                   
+    npm \
     vim \
     wget \
-    pip \
+    python3-pip \
     net-tools \
     iputils-ping \
-    terraform \
     awscli \
     default-jre \
     default-jdk \
     maven \
-    helm \
     ufw \
-    git \
-    go \
-    && rm -rf /var/lib/apt/lists/*
+    go
+    
+# Install kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/
 
+# Install kubens (from kubectx project)
+RUN git clone --depth 1 https://github.com/ahmetb/kubectx.git /opt/kubectx && \
+    ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 
-# Create environment variables that can be set at build time
+# Install Terraform
+RUN curl -LO https://releases.hashicorp.com/terraform/0.15.5/terraform_0.15.5_linux_amd64.zip && \
+    unzip terraform_0.15.5_linux_amd64.zip -d /usr/local/bin/ && \
+    rm terraform_0.15.5_linux_amd64.zip
+
+# Install Helm
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && \
+    chmod +x get_helm.sh && \
+    ./get_helm.sh && \
+    rm get_helm.sh
+
+# Create environment variables
+ENV TEAM=Devops
+
+# Prompt the user to enter values for APP_NAME and ENV during build
 ARG APP_NAME
 ARG ENV
 ENV APP_NAME=$APP_NAME
 ENV ENV=$ENV
-ENV TEAM=Devops
 
+# Set the default user to "root"
 USER root
 
-# Set environment variables
-ENV PORTS="80-6000"
-ENV EXCLUDE_PORTS="3030,4878,4596"
+# Create the "REPOS" directory under root user's home directory
+RUN mkdir -p /root/REPOS
 
-# Install necessary tools and create directories
-RUN apt-get update && apt-get install -y \
-    net-tools \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /root/REPOS/GIT \
-    && mkdir -p /K8S/backend \
-    && mkdir -p /default/FRONTEND \
-    && useradd -m builder
+# Open port range from 80 to 6000 excluding specified ports
+RUN ufw allow 80:6000/tcp && \
+    ufw deny 3030/tcp && \
+    ufw deny 4878/tcp && \
+    ufw deny 4596/tcp && \
+    ufw --force enable
 
-# Open ports
-RUN ufw allow ${PORTS}/tcp
-RUN ufw delete allow ${EXCLUDE_PORTS}/tcp
+# Create a directory called "GIT" under "/root/REPOS"
+RUN mkdir -p /root/REPOS/GIT
 
-# Copy repositories to /root/REPOS/GIT
-COPY KFC-app.git /root/REPOS/GIT/KFC-app.git
-COPY awesome-compose.git /root/REPOS/GIT/awesome-compose.git
-COPY production-deployment.git /root/REPOS/GIT/production-deployment.git
+# Copy repositories to the "GIT" directory
+RUN git clone https://github.com/devopseasylearning/KFC-app.git /root/REPOS/GIT/KFC-app && \
+    git clone https://github.com/devopseasylearning/awesome-compose.git /root/REPOS/GIT/awesome-compose && \
+    git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT/production-deployment
 
-# Switch to the builder user
+# Copy "K8S backend" directory to the default directory
+COPY K8S\ backend /BUILDER/K8S\ backend
+
+# Create a directory called "FRONTEND" and copy "frontend" directory inside
+RUN mkdir -p /BUILDER/FRONTEND && \
+    cp -r frontend /BUILDER/FRONTEND
+
+# Create a user called "builder" and set it as the default user
+RUN useradd -m -s /bin/bash builder
 USER builder
 
-# Set the default working directory
-WORKDIR /home/builder
-
+# Define the entry point for the container
 CMD ["/bin/bash"]
