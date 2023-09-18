@@ -1,6 +1,6 @@
 ARG UBUNTU_VERSION=20.04
 FROM ubuntu:${UBUNTU_VERSION}
-LABEL ="DEVOPS EASY LEARNING"
+LABEL maintainer="DEVOPS EASY LEARNING"
 
 # Set the default directory to "BUILDER"
 WORKDIR /BUILDER
@@ -81,7 +81,7 @@ RUN git clone https://github.com/devopseasylearning/KFC-app.git /root/REPOS/GIT/
     git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT/production-deployment
 
 # Copy "K8S backend" directory to the default directory
-COPY K8S\ backend /BUILDER/K8S\ backend
+COPY K8S\ backend /BUILDER/K8S\ backend/
 
 # Create a directory called "FRONTEND" and copy "frontend" directory inside
 RUN mkdir -p /BUILDER/FRONTEND && \
