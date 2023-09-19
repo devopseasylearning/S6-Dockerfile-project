@@ -8,7 +8,7 @@ FROM ubuntu:${UBUNTU_VERSION}
 LABEL maintainer="DEVOPS EASY LEARNING"
 
 # Install required packages
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y &&\
     ansible \
     curl \
     git \
