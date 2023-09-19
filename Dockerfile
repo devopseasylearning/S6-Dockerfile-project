@@ -1,25 +1,23 @@
-# Define the base image tag version at build time
-ARG UBUNTU_VERSION=20.04
+#Set up ARG variable to allow user to specify tag version at build time
+ARG UBUNTU_VERSION=latest
 
-# Use Ubuntu as the base image with the specified version
+#Use the specified tag version for base image. If a user specifies a different tag version, then 'latest' will be overriden.
 FROM ubuntu:${UBUNTU_VERSION}
 
-# Set the image maintainer/owner
+#set the company DEVOPS EASY LEARNING  as the sole owner of the image
 LABEL maintainer="DEVOPS EASY LEARNING"
 
 # Install required packages
-RUN apt-get update && apt-get install -y &&\
+RUN apt-get update && apt-get install -y \
     ansible \
     curl \
     git \
     gnupg \
     jq \
-    linux-headers-5.4.0-1109-azure \
+    linux-headers-$(uname -r) \
     openssh-client \
     postgresql-client \
     python3 \
-    kubectl \
-    kubens \
     nodejs \
     npm \
     vim \
@@ -27,56 +25,64 @@ RUN apt-get update && apt-get install -y &&\
     python3-pip \
     net-tools \
     iputils-ping \
-    terraform \
     awscli \
     default-jre \
     default-jdk \
     maven \
-    helm \
     ufw \
-    go && \
-    rm -rf /var/lib/apt/lists/*
+    golang-go
 
-# Set the default directory
+# Install kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/
+
+# Install kubens
+RUN curl -LO "https://github.com/ahmetb/kubectx/releases/latest/download/kubens" && \
+    chmod +x kubens && \
+    mv kubens /usr/local/bin/
+
+# Install terraform
+RUN curl -LO "https://releases.hashicorp.com/terraform/0.15.5/terraform_0.15.5_linux_amd64.zip" && \
+    unzip terraform_0.15.5_linux_amd64.zip && \
+    chmod +x terraform && \
+    mv terraform /usr/local/bin/
+
+# Install helm
+RUN curl -LO "https://get.helm.sh/helm-v3.7.1-linux-amd64.tar.gz" && \
+    tar -xvf helm-v3.7.1-linux-amd64.tar.gz && \
+    chmod +x linux-amd64/helm && \
+    mv linux-amd64/helm /usr/local/bin/ && \
+    rm -rf helm-v3.7.1-linux-amd64.tar.gz linux-amd64
+
 WORKDIR /BUILDER
 
-# Create environment variables (APP_NAME and ENV) defined at build time
 ARG APP_NAME
 ARG ENV
-ENV APP_NAME=$APP_NAME
-ENV ENV=$ENV
+ENV APP_NAME=${APP_NAME}
+ENV ENV=${ENV}
 ENV TEAM=Devops
 
-# Set the default user to root
 USER root
 
-# Create the REPOS directory under the root user's home directory
 RUN mkdir -p /root/REPOS
 
-# Open port range from 80 to 6000 (excluding 3030, 4878, 4596)
 RUN ufw allow 80:6000/tcp \
     ufw delete allow 3030/tcp \
     ufw delete allow 4878/tcp \
     ufw delete allow 4596/tcp \
     ufw --force enable
 
-# Create a directory called GIT under REPOS and copy repositories
 RUN mkdir -p /root/REPOS/GIT && \
-    git clone https://github.com/devopseasylearning/KFC-app.git /root/REPOS/GIT/KFC-app && \
-    git clone https://github.com/devopseasylearning/awesome-compose.git /root/REPOS/GIT/awesome-compose && \
-    git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT/production-deployment
-
-# Copy K8S and backend directory under the default directory
-COPY K8S backend /BUILDER/
-
-# Create a directory called FRONTEND under the default directory and copy frontend directory inside
+    git clone https://github.com/devopseasylearning/KFC-app.git /root/REPOS/GIT \
+    git clone https://github.com/devopseasylearning/awesome-compose.git /root/REPOS/GIT  \
+    git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT
+    
+COPY K8S backend /BUILDER
 RUN mkdir -p /BUILDER/FRONTEND && \
-    cp -rf frontend /BUILDER/FRONTEND
+    cp -rf frontend /BUILDER/FRONTEND \
+    useradd -m -s /bin/bash builder 
 
-# Create a user called "builder" and make it the default user
-RUN useradd -m -s /bin/bash builder
 USER builder
-WORKDIR /home/builder
 
-# Specify the command to run when the container starts
 CMD ["/bin/bash"]
