@@ -2,7 +2,7 @@
 ARG BASE_IMAGE_TAG=latest
 
 # Use the base image with the specified tag
-FROM ubuntu:${BASE_IMAGE_TAG}
+FROM ubuntu:$BASE_IMAGE_TAG
 
 # Set the default user to root
 USER root
