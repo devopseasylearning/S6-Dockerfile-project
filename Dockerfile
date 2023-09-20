@@ -11,8 +11,8 @@ RUN apt update && apt install -y  ansible \
     openssh-client \
     postgresql-client \
     python3 \
-    kubectl \
-    kubens \
+    #kubectl \
+    #kubens \
     nodejs \
     npm \
     vim \
@@ -20,12 +20,12 @@ RUN apt update && apt install -y  ansible \
     pip \
     net-tools \
     iputils-ping \
-    terraform \
+    #terraform \
     awscl \
     default-jre \
     default-jdk \
     maven \
-    helm \
+    #helm \
     ufw \
     git \
     golang 
@@ -47,5 +47,4 @@ COPY K8S/backend /BUILDER/K8S/backend
 COPY frontend /BUILDER/FRONTEND
 RUN useradd builder
 USER builder
-CMD ["/bin/bash"] #if the develpoer doesnt ask to put cmd, u dont have to because its already default
-
+CMD ["/bin/bash"]
