@@ -50,5 +50,6 @@ USER builder
 CMD ["/bin/bash"] #if the develpoer doesnt ask to put cmd, u dont have to because its already default
 
 # the back slash at install means the linux will read it as one line
-# user zero is the group of the root
-docker build --build-arg TAG=22.04 --build-arg APP_NAME =s6 --build-arg ENV=development 
+# user zero is the group of the root 
+# build --build-arg TAG=22.04 --build-arg APP_NAME =s6 --build-arg ENV=development 
+#docker build --build-arg TAG =22.04 --build-arg APP_NAME=S6 --build-arg APP_NAME="learning_dockerfile" -t  devopseasylearning/s6christopher:V1.0.1 .
