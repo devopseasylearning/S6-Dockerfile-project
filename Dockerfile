@@ -92,6 +92,3 @@ COPY frontend /BUILDER/FRONTEND
 RUN useradd -m -s /bin/bash builder
 
 USER builder
-
-
-CMD ["/bin/bash"]
