@@ -1,23 +1,21 @@
-# Use the official Ubuntu as the base image with ARG for version tag
-ARG UBUNTU_VERSION=latest
+ARG UBUNTU_VERSION=20.04
 FROM ubuntu:${UBUNTU_VERSION}
-
-# Set the maintainer label
-LABEL maintainer="DEVOPS EASY LEARNING"
-
-# Install required packages
-RUN apt-get update && apt-get install -y \
+LABEL maintainer="DEVOPS EASY LEARNING <devops@example.com>"
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
     ansible \
     curl \
     git \
     gnupg \
     jq \
-    linux-headers-$(uname -r) \
+    linux-headers-generic \
     openssh-client \
     postgresql-client \
     python3 \
-    kubectl \
-    kubens \
+    software-properties-common \
+    && add-apt-repository universe \
+    && apt-get update \
+    && apt-get install -y \
     nodejs \
     npm \
     vim \
@@ -25,53 +23,42 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     net-tools \
     iputils-ping \
-    terraform \
     awscli \
     default-jre \
     default-jdk \
     maven \
-    helm \
+    unzip \
     ufw \
-    go && \
-    rm -rf /var/lib/apt/lists/*
-
-# Set the default working directory
+    golang-go
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/
+RUN git clone --depth 1 https://github.com/ahmetb/kubectx.git /opt/kubectx && \
+    ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+RUN curl -LO https://releases.hashicorp.com/terraform/0.15.5/terraform_0.15.5_linux_amd64.zip && \
+    unzip terraform_0.15.5_linux_amd64.zip -d /usr/local/bin/ && \
+    rm terraform_0.15.5_linux_amd64.zip
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && \
+    chmod +x get_helm.sh && \
+    ./get_helm.sh && \
+    rm get_helm.sh
 WORKDIR /BUILDER
-
-# Create environment variables
 ARG APP_NAME
 ARG ENV
-ENV APP_NAME=${APP_NAME} ENV=${ENV} TEAM=Devops
-
-# Set the default user to root
+ENV TEAM=Devops
 USER root
-
-# Create directories and open ports
-RUN mkdir -p /root/REPOS/GIT && \
-    mkdir -p /BUILDER/K8S/backend && \
-    mkdir -p /BUILDER/FRONTEND && \
-    mkdir -p /root/REPOS/GIT && \
-    apt-get update && \
-    apt-get install -y ufw && \
-    ufw allow 80:6000/tcp && \
-    ufw delete allow 3030/tcp && \
-    ufw delete allow 4878/tcp && \
-    ufw delete allow 4596/tcp && \
-    ufw --force enable
-
-# Copy repositories
-COPY ./KFC-app.git /root/REPOS/GIT/
-COPY ./awesome-compose.git /root/REPOS/GIT/
-COPY ./production-deployment.git /root/REPOS/GIT/
-
-# Copy K8S backend and frontend
-COPY ./K8S/backend /BUILDER/K8S/backend
-COPY ./frontend /BUILDER/FRONTEND
-
-# Create a user "builder" and set it as the default user
+RUN mkdir -p /root/REPOS
+EXPOSE 80-3029
+EXPOSE 3031-4877
+EXPOSE 4597-6000
+RUN mkdir -p /root/REPOS/GIT
+COPY KFC-app /root/REPOS/GIT/
+COPY awesome-compose /root/REPOS/GIT
+COPY production-deployment /root/REPOS/GIT/
+COPY K8S /BUILDER/
+COPY backend /BUILDER/
+RUN mkdir -p /BUILDER/FRONTEND
+COPY frontend /BUILDER/FRONTEND
 RUN useradd -ms /bin/bash builder
 USER builder
-
-
-# Set the command to run when the container starts
 CMD ["/bin/bash"]
