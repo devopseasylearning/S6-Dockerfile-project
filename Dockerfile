@@ -1,20 +1,25 @@
-#Set up ARG variable to allow user to specify tag version at build time
+# Set up ARG variable to allow user to specify tag version at build time
 ARG UBUNTU_VERSION=latest
 
-#Use the specified tag version for base image. If a user specifies a different tag version, then 'latest' will be overriden.
+# Use the specified tag version for base image. If a user specifies a different tag version, then 'latest' will be overriden.
 FROM ubuntu:${UBUNTU_VERSION}
 
-#set the company DEVOPS EASY LEARNING  as the sole owner of the image
+# set the company DEVOPS EASY LEARNING  as the sole owner of the image
 LABEL maintainer="DEVOPS EASY LEARNING"
+
+# Set timezone:
+# ENV CONTAINER_TIMEZONE=US/Texas
+RUN ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && echo $CONTAINER_TIMEZONE > /etc/timezone
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
     ansible \
     curl \
     git \
+    unzip \
     gnupg \
     jq \
-    linux-headers-$(uname -r) \
+    linux-headers-generic \
     openssh-client \
     postgresql-client \
     python3 \
@@ -56,33 +61,37 @@ RUN curl -LO "https://get.helm.sh/helm-v3.7.1-linux-amd64.tar.gz" && \
     rm -rf helm-v3.7.1-linux-amd64.tar.gz linux-amd64
 
 WORKDIR /BUILDER
-
+# Set the necessary arguments and Environments
 ARG APP_NAME
 ARG ENV
 ENV APP_NAME=${APP_NAME}
 ENV ENV=${ENV}
 ENV TEAM=Devops
 
+# Set root as user 
 USER root
 
 RUN mkdir -p /root/REPOS
 
-RUN ufw allow 80:6000/tcp \
-    ufw delete allow 3030/tcp \
-    ufw delete allow 4878/tcp \
-    ufw delete allow 4596/tcp \
-    ufw --force enable
+# Expose the required ports
+EXPOSE 80-3029
+EXPOSE 3031-4877
+EXPOSE 4597-6000
 
-RUN mkdir -p /root/REPOS/GIT && \
-    git clone https://github.com/devopseasylearning/KFC-app.git /root/REPOS/GIT \
-    git clone https://github.com/devopseasylearning/awesome-compose.git /root/REPOS/GIT  \
-    git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT
-    
-COPY K8S backend /BUILDER
-RUN mkdir -p /BUILDER/FRONTEND && \
-    cp -rf frontend /BUILDER/FRONTEND \
-    useradd -m -s /bin/bash builder 
+# Make GIT repo
+RUN mkdir -p /root/REPOS/GIT
+
+# Copy repositories
+COPY ./files/* /root/REPOS/GIT/
+COPY K8S backend /BUILDER/
+
+RUN mkdir /BUILDER/FRONTEND
+COPY frontend /BUILDER/FRONTEND
+
+#Create a User
+RUN useradd -m -s /bin/bash builder
 
 USER builder
+
 
 CMD ["/bin/bash"]
