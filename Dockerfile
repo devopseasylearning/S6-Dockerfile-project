@@ -1,5 +1,5 @@
 # Set up ARG variable to allow the user to specify the tag version at build time
-ARG UBUNTU_VERSION=22.04
+ARG UBUNTU_VERSION=latest
 
 # Use the specified tag version for the base image. If a user specifies a different tag version, then 'latest' will be overridden.
 FROM ubuntu:${UBUNTU_VERSION}
