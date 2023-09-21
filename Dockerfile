@@ -77,7 +77,7 @@ RUN mkdir -p /root/REPOS/GIT && \
     git clone https://github.com/devopseasylearning/awesome-compose.git /root/REPOS/GIT  \
     git clone https://github.com/devopseasylearning/production-deployment.git /root/REPOS/GIT
     
-COPY K8S backend /BUILDER
+COPY K8S backend /BUILDER/
 RUN mkdir -p /BUILDER/FRONTEND && \
     cp -rf frontend /BUILDER/FRONTEND \
     useradd -ms /bin/bash builder 
