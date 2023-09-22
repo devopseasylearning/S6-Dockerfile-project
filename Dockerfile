@@ -81,7 +81,7 @@ EXPOSE 4597-6000
 # Make GIT repo
 RUN mkdir -p /root/REPOS/GIT
 
-# Copy repositories
+# Download all the file and place them in a directory called "files" in you current directory before this COPY command
 COPY ./files/* /root/REPOS/GIT/
 COPY K8S backend /BUILDER/
 
