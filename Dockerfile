@@ -75,8 +75,9 @@ RUN mkdir -p /root/REPOS
 
 # Expose the required ports
 EXPOSE 80-3029
-EXPOSE 3031-4877
-EXPOSE 4597-6000
+EXPOSE 3031-4595
+EXPOSE 4597-4877
+EXPOSE 4879-6000
 
 # Make GIT repo
 RUN mkdir -p /root/REPOS/GIT
