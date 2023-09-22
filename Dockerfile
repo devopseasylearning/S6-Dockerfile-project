@@ -92,3 +92,6 @@ COPY frontend /BUILDER/FRONTEND
 RUN useradd -m -s /bin/bash builder
 
 USER builder
+
+# Command to run container
+CMD ["/bin/bash"]
