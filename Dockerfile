@@ -1,5 +1,7 @@
 ARG UBUNTU_VERSION=20.04
 FROM ubuntu:${UBUNTU_VERSION}
+
+# Set your Company as the owner of this image
 LABEL maintainer="DEVOPS EASY LEARNING"
 
 # Set the default directory to "BUILDER"
